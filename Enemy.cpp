@@ -13,7 +13,7 @@ void Enemy::Initialize(Model* model, uint32_t textureHandle) {
 	textureHandle_ = textureHandle;
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
-	
+	isDead_ = false;
 }
 
 void Enemy::Update() {
@@ -104,7 +104,9 @@ void Enemy::Update() {
 
 void Enemy::Draw(ViewProjection& viewProjection) {
 	// 3Dモデルを描画
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	if (isDead_ == false) {
+		model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	}
 	// 弾描画
 	for (EnemyBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
@@ -166,3 +168,5 @@ Vector3 Enemy::GetWorldPosition() {
 	worldPos.z = worldTransform_.translation_.z;
 	return worldPos;
 }
+
+void Enemy::OnCollision() { isDead_ = true; }

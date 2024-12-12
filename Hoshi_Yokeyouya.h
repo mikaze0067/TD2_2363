@@ -3,31 +3,30 @@
 #include "Audio.h"
 #include "DirectXCommon.h"
 #include "Input.h"
+#include "MathUtilityForText.h"
 #include "Model.h"
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include <DebugCamera.h>
-#include <Player.h>
-#include "MathUtilityForText.h"
 #include <Enemy.h>
-
+#include <Player.h>
+#include "Haikei.h"
 
 /// <summary>
 /// ゲームシーン
 /// </summary>
-class GameScene {
-
+class Hoshi_Yokeyouya {
 public: // メンバ関数
 	/// <summary>
 	/// コンストクラタ
 	/// </summary>
-	GameScene();
+	Hoshi_Yokeyouya();
 
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~GameScene();
+	~Hoshi_Yokeyouya();
 
 	/// <summary>
 	/// 初期化
@@ -44,6 +43,9 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
+	void CheckAllCollision();
+
+	bool IsOne() const { return one_; }
 	bool IsFinished() const { return finished_; }
 
 	void GameOver();
@@ -53,6 +55,7 @@ public: // メンバ関数
 	// 3Dモデル
 	Model* model_ = nullptr;
 	Model* modelEnemy_ = nullptr;
+	Model* modelHaikei_ = nullptr;
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
 	// ビュープロジェクション
@@ -66,18 +69,17 @@ private: // メンバ変数
 	uint32_t textureHandle_ = 0;
 	// テクスチャハンドル
 	uint32_t textureHandleEnemy_ = 0;
-	//自キャラ
+	// 自キャラ
 	Player* player_ = nullptr;
 	// 敵キャラ
 	Enemy* enemy_ = nullptr;
-	//デバッグカメラ有効
+	// デバッグカメラ有効
 	bool isDebugCameraActive_ = false;
 
 	DebugCamera* debugCamera_ = nullptr;
 
+	bool one_ = false;
 	bool finished_ = false;
-
-	/// <summary>
-	/// ゲームシーン用
-	/// </summary>
+	// 天球
+	Haikei* haikei_ = nullptr;
 };

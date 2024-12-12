@@ -40,6 +40,14 @@ public: // メンバ関数
 
 	void SetPlayer(Player* player) { player_ = player;}
 
+	// ワールド座標を取得するメソッド
+	Vector3 GetWorldPosition() const { return worldTransform_.translation_; }
+
+	void OnCollision();
+
+	const std::list<EnemyBullet*>& GetBullets() const { return bullets_; }
+
+
 private:
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
@@ -55,4 +63,7 @@ private:
 	int32_t fireTimer = 0;
 	//自キャラ
 	Player* player_ = nullptr;
+	// デスフラグ
+	bool isDead_ = false;
+
 };

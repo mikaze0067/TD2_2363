@@ -25,6 +25,11 @@ public: // メンバ関数
 
 	bool IsDead() const { return isDead_; }
 
+	// ワールド座標を取得するメソッド
+	Vector3 GetWorldPosition() const { return worldTransform_.translation_; }
+
+	void OnCollision();
+
 	static const int32_t kLifeTime = 60 * 5;
 
 private:

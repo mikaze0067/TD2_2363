@@ -20,8 +20,14 @@ void SelectScene::Initialize()
 
 void SelectScene::Update()
 {
-	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
-		finished_ = true;
+	if (Input::GetInstance()->TriggerKey(DIK_1)) {
+		One_ = true;
+	}
+	if (Input::GetInstance()->TriggerKey(DIK_2)) {
+		Two_ = true;
+	}
+	if (Input::GetInstance()->TriggerKey(DIK_3)) {
+		Three_ = true;
 	}
 }
 

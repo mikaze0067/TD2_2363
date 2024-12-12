@@ -113,15 +113,18 @@
     <ClCompile Include="base\WinApp.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
+    <ClCompile Include="Hoshi_Yokeyouya.cpp" />
+    <ClCompile Include="Hoshi_Yokeyouya2.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathUtilityForText.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerBullet.cpp" />
     <ClCompile Include="scene\GameClearScene.cpp" />
     <ClCompile Include="scene\GameOverScene.cpp" />
-    <ClCompile Include="scene\GameScene.cpp" />
+    <ClCompile Include="scene\Hoshi_Yokeyouya3D.cpp" />
     <ClCompile Include="scene\SelectScene.cpp" />
     <ClCompile Include="scene\TitleScene.cpp" />
+    <ClCompile Include="Haikei.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="2d\ImGuiManager.h" />
@@ -151,6 +154,8 @@
     <ClInclude Include="base\WinApp.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyBullet.h" />
+    <ClInclude Include="Hoshi_Yokeyouya.h" />
+    <ClInclude Include="Hoshi_Yokeyouya2.h" />
     <ClInclude Include="input\Input.h" />
     <ClInclude Include="MathUtilityForText.h" />
     <ClInclude Include="math\Matrix4x4.h" />
@@ -161,9 +166,10 @@
     <ClInclude Include="PlayerBullet.h" />
     <ClInclude Include="scene\GameClearScene.h" />
     <ClInclude Include="scene\GameOverScene.h" />
-    <ClInclude Include="scene\GameScene.h" />
+    <ClInclude Include="scene\Hoshi_Yokeyouya3D.h" />
     <ClInclude Include="scene\SelectScene.h" />
     <ClInclude Include="scene\TitleScene.h" />
+    <ClInclude Include="Haikei.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\TerrainPS.hlsl">

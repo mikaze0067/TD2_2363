@@ -1,6 +1,6 @@
 #pragma once
 #include "DirectXCommon.h"
-#include "GameScene.h"
+#include "Hoshi_Yokeyouya3D.h"
 #include "Input.h"
 #include "Model.h"
 #include "ViewProjection.h"

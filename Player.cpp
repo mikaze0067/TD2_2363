@@ -62,7 +62,7 @@ void Player::Update() {
 	worldTransform_.translation_.y = max(worldTransform_.translation_.y, -kMoveLimitY);
 	worldTransform_.translation_.y = min(worldTransform_.translation_.y, +kMoveLimitY);
 
-	// 回転の速さ[ラジアン/frame]
+	/*// 回転の速さ[ラジアン/frame]
 	const float kRotSpeed = 0.02f;
 
 	// 押した方向で移動ベクトルを変更
@@ -70,7 +70,7 @@ void Player::Update() {
 		worldTransform_.rotation_.y -= kRotSpeed;
 	} else if (input_->PushKey(DIK_D)) {
 		worldTransform_.rotation_.y += kRotSpeed;
-	}
+	}*/
 
 	//キャラクター攻撃処理
 	Attack();
@@ -134,3 +134,5 @@ Vector3 Player::GetWorldPosition() {
 	worldPos.z = worldTransform_.translation_.z;
 	return worldPos;
 }
+
+void Player::OnCollision() {}

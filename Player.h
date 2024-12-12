@@ -1,3 +1,4 @@
+#pragma once
 #include <Model.h>
 #include "ViewProjection.h"
 #include "WorldTransform.h"
@@ -30,6 +31,15 @@ public: // メンバ関数
 	//ワールド座標を取得
 	Vector3 GetWorldPosition();
 
+	// 弾
+	std::list<PlayerBullet*> bullets_;
+
+	// 衝突を検知したら呼び出されるコールバック関数
+	void OnCollision();
+
+	const std::list<PlayerBullet*>& GetBullet() const { return bullets_; }
+
+
 private:
 
 	// ワールドトランスフォーム
@@ -40,7 +50,8 @@ private:
 	uint32_t textureHandle_ = 0u;
 	//キーボード入力
 	Input* input_ = nullptr;
-	//弾
-	std::list<PlayerBullet*> bullets_;
+	
+	
+
 
 };

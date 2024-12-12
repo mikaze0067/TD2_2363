@@ -4,7 +4,7 @@
 #include "WorldTransform.h"
 #include "DirectXCommon.h"
 #include "Input.h"
-#include "GameScene.h"
+#include "Hoshi_Yokeyouya3D.h"
 /// <summary>
 /// タイトルシーン
 /// </summary>
@@ -26,7 +26,11 @@ public:
 	/// </summary>
 	void Draw();
 
-	bool IsFinished() const { return finished_; }
+	bool IsOne() const { return One_; }
+
+	bool IsTwo() const { return Two_; }
+
+	bool IsThree() const { return Three_; }
 
 private:
 
@@ -34,7 +38,9 @@ private:
 	WorldTransform titleWorldTransform_;
 	ViewProjection viewProjection_;
 
-	bool finished_ = false;
+	bool One_ = false;
+	bool Two_ = false;
+	bool Three_ = false;
 
 	uint32_t selectHandle_ = 0;
 	Sprite* selectSprite_ = nullptr;
