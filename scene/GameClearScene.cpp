@@ -1,3 +1,4 @@
+#pragma once
 #include "GameClearScene.h"
 #include <numbers>
 #include <TextureManager.h>
@@ -7,12 +8,13 @@ void GameClearScene::Initialize() {
 	titleWorldTransform_.Initialize();
 	viewProjection_.Initialize();
 
-	CrearHandle_ = TextureManager::Load("Blue.png");
+	CrearHandle_ = TextureManager::Load("clear.png");
 	crearSprite_ = Sprite::Create(CrearHandle_, {0, 0});
 }
 
 void GameClearScene::Update() {
-	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
+
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 		finished_ = true;
 	}
 }

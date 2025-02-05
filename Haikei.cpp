@@ -8,6 +8,8 @@ void Haikei::Initialize(Model* model, ViewProjection* viewProjection) {
 
 void Haikei::Update() {
 	worldTransform_.UpdateMatrix();
+	worldTransform_.rotation_.y -= 0.02f;
+	worldTransform_.translation_.y = -15.0f;
 }
 
 void Haikei::Draw() {

@@ -7,10 +7,10 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include <DebugCamera.h>
-#include <Player.h>
+#include <Player3D.h>
 #include "MathUtilityForText.h"
-#include <Enemy.h>
-
+#include <Enemy3D.h>
+#include <Haikei.h>
 
 /// <summary>
 /// ゲームシーン
@@ -48,14 +48,19 @@ public: // メンバ関数
 	bool IsThree() const { return three_; }
 
 	bool IsFinished() const { return finished_; }
+	
+	bool IsHealth() const { return HealthFlag_; }
 
 	void GameOver();
 
 	void GameClear();
 
 	// 3Dモデル
-	Model* model_ = nullptr;
-	Model* modelEnemy_ = nullptr;
+	Model* modelPlayer3D_ = nullptr;
+	Model* modelEnemy3D_ = nullptr;
+	Model* modelHaikei_ = nullptr;
+	Model* modelPlayerBullet_ = nullptr;
+
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
 	// ビュープロジェクション
@@ -65,19 +70,19 @@ private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
-	// テクスチャハンドル
-	uint32_t textureHandle_ = 0;
-	// テクスチャハンドル
-	uint32_t textureHandleEnemy_ = 0;
 	// 自キャラ
-	Player* player_ = nullptr;
+	Player3D* player3D_ = nullptr;
 	// 敵キャラ
-	Enemy* enemy_ = nullptr;
-	// デバッグカメラ有効
-	bool isDebugCameraActive_ = false;
-
-	DebugCamera* debugCamera_ = nullptr;
+	Enemy3D* enemy3D_ = nullptr;
 
 	bool three_ = false;
 	bool finished_ = false;
+	bool HealthFlag_ = false;
+
+	// 天球
+	Haikei* haikei_ = nullptr;
+
+	// サウンド
+	uint32_t soundDataHandle = 0;
+	uint32_t voiceHandle = 0;
 };

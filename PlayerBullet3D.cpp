@@ -1,0 +1,37 @@
+#include "MathUtilityForText.h"
+#include "PlayerBullet3D.h"
+#include <TextureManager.h>
+
+void PlayerBullet3D::Initialize(Model* model, const Vector3& position, const Vector3& velocity) {
+	// NULLポインタチェック
+	assert(model);
+
+	model_ = model;
+	textureHandle_ = TextureManager::Load("Red.png");
+	// ワールド変換の初期化
+	worldTransform_.Initialize();
+	// 引数で受け取った初期座標をセット
+	worldTransform_.translation_ = position;
+	// 引数で受け取った速度をメンバ変数に代入
+	velocity_ = velocity;
+
+	velocity_ = {0.0f, 0.0f, 1.0f};
+}
+
+void PlayerBullet3D::Update() {
+
+	// 時間経過でデス
+	if (--deathTimer_ <= 0) {
+		isDead_ = true;
+	}
+
+	// 座標を移動させる（1フレーム分の移動量を足しこむ）
+	worldTransform_.translation_ += velocity_;
+
+	// ワールド変換の更新
+	worldTransform_.UpdateMatrix();
+}
+
+void PlayerBullet3D::Draw(const ViewProjection& viewProjection) { model_->Draw(worldTransform_, viewProjection, textureHandle_); }
+
+void PlayerBullet3D::OnCollision() { isDead_ = true; }

@@ -10,6 +10,9 @@
 /// </summary>
 class GameOverScene {
 public:
+	GameOverScene();
+
+	~GameOverScene();
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -32,23 +35,14 @@ private:
 	DirectXCommon* dxCommon_ = nullptr;
 	WorldTransform titleWorldTransform_;
 	ViewProjection viewProjection_;
+	Audio* audio_ = nullptr;
 
 	bool finished_ = false;
 
+	Sprite* gameOverSprite_ = nullptr;
+	uint32_t gameOverTextureHandle_ = 0u;
 
-	// 2Dスプライト
-	Sprite* sprite_ = nullptr;
-	// テクスチャ
-	uint32_t textureHandleRed_ = 0u;
-
-	// 透明度制御用の変数
-	Vector4 color = {1.0f, 1.0f, 1.0f, alpha};
-	float alpha = 0.027f;
-
-	// ボスフラグ
-	bool bossFrag = false;
-	// ボスフラグを制御する補助フラグ
-	bool bossActivated = false;
-	// カウントダウンタイマー
-	int timer = 0;
+	//サウンド
+	uint32_t soundDataHandle=0;
+	uint32_t voiceHandle=0;    
 };

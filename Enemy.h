@@ -3,6 +3,8 @@
 #include <Model.h>
 #include "ViewProjection.h"
 #include <EnemyBullet.h>
+#include <Sprite.h>
+#include <DirectXCommon.h>
 enum class Phase {
 	Approach, //接近する
 	Leave,    //離脱する
@@ -15,7 +17,7 @@ public: // メンバ関数
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Model* model,uint32_t textureHandle);
+	void Initialize(Model* model,ViewProjection*viewProjection);
 
 	/// <summary>
 	/// 毎フレーム処理
@@ -47,14 +49,17 @@ public: // メンバ関数
 
 	const std::list<EnemyBullet*>& GetBullets() const { return bullets_; }
 
+	bool IsFinished()const { return finished_; }
+
 
 private:
+
+	DirectXCommon* dxCommon_ = nullptr;
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
+	ViewProjection* viewProjection_ = nullptr;
 	// 3Dモデル
 	Model* model_ = nullptr;
-	// テクスチャハンドル
-	uint32_t textureHandle_ = 0u;
 	//フェーズ
 	Phase phase_ = Phase::Approach;
 	// 弾
@@ -66,4 +71,13 @@ private:
 	// デスフラグ
 	bool isDead_ = false;
 
+	bool finished_ = false;
+
+	int hp_;
+
+	int fireCount_ = 0; // 弾の発射回数を追跡
+
+	std::vector<Sprite*> hpSprites_;
+
+	Model* enemyModel_ = nullptr;
 };

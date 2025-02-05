@@ -12,6 +12,7 @@
 #include <Enemy.h>
 #include <Player.h>
 #include "Haikei.h"
+#include "PlayerBullet.h"
 
 /// <summary>
 /// ゲームシーン
@@ -48,14 +49,18 @@ public: // メンバ関数
 	bool IsOne() const { return one_; }
 	bool IsFinished() const { return finished_; }
 
+	bool IsHealth()const { return HealthFlag_; }
+
 	void GameOver();
 
 	void GameClear();
 
 	// 3Dモデル
-	Model* model_ = nullptr;
+	Model* modelPlayer_ = nullptr;
 	Model* modelEnemy_ = nullptr;
 	Model* modelHaikei_ = nullptr;
+	Model* modelPlayerBullet_ = nullptr;
+	
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
 	// ビュープロジェクション
@@ -65,10 +70,6 @@ private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
-	// テクスチャハンドル
-	uint32_t textureHandle_ = 0;
-	// テクスチャハンドル
-	uint32_t textureHandleEnemy_ = 0;
 	// 自キャラ
 	Player* player_ = nullptr;
 	// 敵キャラ
@@ -80,6 +81,13 @@ private: // メンバ変数
 
 	bool one_ = false;
 	bool finished_ = false;
+
+	bool HealthFlag_ = false;
 	// 天球
 	Haikei* haikei_ = nullptr;
+	// 自機弾
+	//PlayerBullet* playerBullet_ = nullptr;
+
+	// 敵の弾
+	//EnemyBullet* enemyBullet_ = nullptr;
 };

@@ -1,3 +1,5 @@
+
+#pragma once
 #include "SelectScene.h"
 #include <numbers>
 #include <TextureManager.h>
@@ -14,7 +16,7 @@ void SelectScene::Initialize()
 	titleWorldTransform_.Initialize();
 	viewProjection_.Initialize();
 
-	selectHandle_ = TextureManager::Load("Blue.png");
+	selectHandle_ = TextureManager::Load("StageSelect.png");
 	selectSprite_ = Sprite::Create(selectHandle_, { 0,0 });
 }
 
@@ -48,4 +50,5 @@ void SelectScene::Draw()
 	// スプライト描画後処理
 	Sprite::PostDraw();
 
+	
 }

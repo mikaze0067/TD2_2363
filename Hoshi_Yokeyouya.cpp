@@ -8,24 +8,25 @@
 Hoshi_Yokeyouya::Hoshi_Yokeyouya() {}
 
 Hoshi_Yokeyouya::~Hoshi_Yokeyouya() {
-	delete model_;
+	delete modelPlayer_;
 	delete player_;
 	delete debugCamera_;
 	delete enemy_;
+	delete haikei_;
+	delete modelEnemy_;
 }
 
 void Hoshi_Yokeyouya::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-	// ファイル名を指定してテクスチャを読み込む
-	textureHandle_ = TextureManager::Load("mario.jpg ");
-	textureHandleEnemy_ = TextureManager::Load("Blue.png ");
 
 	// 3Dモデルの生成
-	model_ = Model::Create();
-	modelEnemy_ = Model::Create();
+	modelPlayer_ = Model::CreateFromOBJ("ziki",true);
+	modelEnemy_ = Model::CreateFromOBJ("hosi", true);
 	modelHaikei_ = Model::CreateFromOBJ("Haikei", true);
+	//modelBullet_ = Model::CreateFromOBJ("wifi", true);
+	
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
@@ -35,22 +36,22 @@ void Hoshi_Yokeyouya::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 	// 自キャラの初期化
-	player_->Initialize(model_, textureHandle_);
+	player_->Initialize(modelPlayer_,&viewProjection_);
 
 	// 敵キャラの生成
 	enemy_ = new Enemy();
 	// 敵キャラの初期化
-	enemy_->Initialize(modelEnemy_, textureHandleEnemy_);
+	enemy_->Initialize(modelEnemy_,&viewProjection_ );
 
 	// 天球の生成
 	haikei_ = new Haikei();
 	// 天球の初期化
 	haikei_->Initialize(modelHaikei_, &viewProjection_);
-
 	// 軸方向表示の表示を有効にする
 	AxisIndicator::GetInstance()->SetVisible(true);
 	// 軸方向表示が参照するビュープロジェクションを指定する（アドレス渡し）
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
+
 }
 
 void Hoshi_Yokeyouya::Update() {
@@ -62,16 +63,17 @@ void Hoshi_Yokeyouya::Update() {
 	// 敵キャラの更新
 	enemy_->Update();
 
+	if (enemy_->IsFinished() == true || player_->IsFinished() == true) {
+		finished_ = true;
+	}
+
+	HealthFlag_ = player_->IsHealth();
+
 	// 敵キャラに自キャラのアドレスを渡す
 	enemy_->SetPlayer(player_);
 
 	CheckAllCollision();
-	// キャラクターの座標を画面表示する処理
-	ImGui::Begin("Scene");
-
-	ImGui::Text("kHoshi_Yokeyouya"); // フェーズ名を表示
-
-	ImGui::End();
+	
 }
 
 void Hoshi_Yokeyouya::Draw() {// コマンドリストの取得
@@ -119,6 +121,7 @@ void Hoshi_Yokeyouya::Draw() {// コマンドリストの取得
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+	
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -145,7 +148,7 @@ void Hoshi_Yokeyouya::CheckAllCollision() {
 
 			if (((posB.x - posA.x) * (posB.x - posA.x) + (posB.y - posA.y) * (posB.y - posA.y) + (posB.z - posA.z) * (posB.z - posA.z) <= (1.0f + 1.0f) * (1.0f + 1.0f))) {
 				count++;
-				if (count <= 50) {
+				if (count <= 5) {
 					enemy_->OnCollision();
 					bullet->OnCollision();
 				}

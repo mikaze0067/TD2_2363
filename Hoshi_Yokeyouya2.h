@@ -46,14 +46,14 @@ public: // メンバ関数
 
 	bool IsTwo() const { return two_; }
 	bool IsFinished() const { return finished_; }
-
+	bool IsHealth()const { return HealthFlag_; }
 
 	void GameOver();
 
 	void GameClear();
 
 	// 3Dモデル
-	Model* model_ = nullptr;
+	Model* modelPlayer_ = nullptr;
 	Model* modelEnemy_ = nullptr;
 	Model* modelHaikei_ = nullptr;
 	// ワールドトランスフォーム
@@ -80,6 +80,13 @@ private: // メンバ変数
 
 	bool two_ = false;
 	bool finished_ = false;
+	bool HealthFlag_ = false;
 	// 天球
 	Haikei* haikei_ = nullptr;
+
+	//サウンド
+	uint32_t soundDataHandle=0;
+	uint32_t voiceHandle=0;    
+
+	int currentStage_ = 0;
 };

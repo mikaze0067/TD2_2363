@@ -1,19 +1,31 @@
 #include "Enemy.h"
 #include <cassert>
 #include "MathUtilityForText.h"
-#include <imgui.h>
 #include <Player.h>
+#include <TextureManager.h>
 
 
-void Enemy::Initialize(Model* model, uint32_t textureHandle) {
+
+
+void Enemy::Initialize(Model* model, ViewProjection*viewProjection) {
 	// NULLポインタチェック
 	assert(model);
-
+	dxCommon_ = DirectXCommon::GetInstance();
 	model_ = model;
-	textureHandle_ = textureHandle;
+	viewProjection_ = viewProjection;
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
 	isDead_ = false;
+
+	hp_ = 30;
+	fireCount_ = 0; // 発射カウンタを初期化
+
+	// HPのリソースを格納
+	for (int i = 1; i <= 30; i++) {
+		std::string filePath = "HP/enemyHp" + std::to_string(i) + ".png";
+		uint32_t handle = TextureManager::Load(filePath);
+		hpSprites_.push_back(Sprite::Create(handle, {950, 30}));
+	}
 }
 
 void Enemy::Update() {
@@ -27,7 +39,7 @@ void Enemy::Update() {
 		return false;
 	});
 	
-	worldTransform_.translation_.z = 10.0f;
+	worldTransform_.translation_.x = 30.0f;
 
 	// キャラクターの移動ベクトル
 	Vector3 move = {0, 0, 0};
@@ -35,7 +47,7 @@ void Enemy::Update() {
 	// キャラクターの移動速さ
 	const float kCharacterSpeed = 0.2f;
 
-	move.x -= kCharacterSpeed;
+	move.y -= kCharacterSpeed;
 	//move.x += kCharacterSpeed;
 	//move.y -= kCharacterSpeed;
 	//move.y += kCharacterSpeed;
@@ -70,8 +82,8 @@ void Enemy::Update() {
 	}
 
 	const char* phaseName = "Approach";
-	Vector3 Amove = {0.2f, 0.0f, 0.0f};
-	Vector3 Lmove = {0.2f, 0.0f, 0.0f};
+	Vector3 Amove = {0.0f, 0.8f, 0.0f};
+	Vector3 Lmove = {0.0f, 0.8f, 0.0f};
 	switch (phase_) {
 	case Phase::Approach:
 	default:
@@ -80,7 +92,7 @@ void Enemy::Update() {
 		// 移動（ベクトルを加算）
 		worldTransform_.translation_ += Amove;
 		// 既定の位置に到達したら離脱
-		if (worldTransform_.translation_.x > 20.0f) {
+		if (worldTransform_.translation_.y > 10.0f) {
 			phase_ = Phase::Leave;
 		}
 		break;
@@ -90,56 +102,79 @@ void Enemy::Update() {
 		// 移動（ベクトルを加算）
 		worldTransform_.translation_ -= Lmove;
 		// 既定の位置に到達したら離脱
-		if (worldTransform_.translation_.x < -20.0f) {
+		if (worldTransform_.translation_.y < -8.0f) {
 			phase_ = Phase::Approach;
 		}
 	}
-	// キャラクターの座標を画面表示する処理
-	ImGui::Begin("Player");
-
-	ImGui::Text("Current Phase: %s", phaseName); // フェーズ名を表示
-
-	ImGui::End();
 }
 
 void Enemy::Draw(ViewProjection& viewProjection) {
 	// 3Dモデルを描画
 	if (isDead_ == false) {
-		model_->Draw(worldTransform_, viewProjection, textureHandle_);
+		model_->Draw(worldTransform_, viewProjection);
 	}
 	// 弾描画
 	for (EnemyBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
+		
+	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
+
+	// 前景スプライト描画前処理
+	Sprite::PreDraw(commandList);
+
+	/// <summary>
+	/// ここに前景スプライトの描画処理を追加できる
+	/// </summary>
+	/// 
+	
+	if (hp_ > 0 && hp_ <= 30) {
+		hpSprites_[hp_ - 1]->Draw();
+	}
+
+	// スプライト描画後処理
+	Sprite::PostDraw();
 }
 
 void Enemy::Fire() {
-	assert(player_);
+	// 通常の弾の速度
+	const float kNormalBulletSpeed = 0.5f;
+	// 速い弾の速度
+	const float kFastBulletSpeed = 1.0f;
+	// 一度に発射する弾の数
+	const int kBulletsPerFire = 4; // 一度に発射する弾の数
+	// 速い弾が発射される確率（0.0f ～ 1.0f）
+	const float kFastBulletProbability = 0.3f; // 30%の確率で速い弾
 
-	// 弾の速度(調整項目)
-	const float kBulletSpeed = -1.0f;
+	// 弾の初期位置のランダム範囲
+	const float kRandomRangeX = 5.0f;  // X軸のランダム範囲
+	const float kRandomRangeY = 20.0f; // Y軸のランダム範囲
 
-	Vector3 velocity(0, 0, kBulletSpeed);
-	// 速度ベクトルを自機の向きに合わせて回転させる
-	velocity = TransformNormal(velocity, worldTransform_.matWorld_);
-	
-	//自キャラの座標を取得する
-	Vector3 playerPos = player_->GetWorldPosition();
-	//敵キャラの座標を取得する
-	Vector3 enemyPos = Enemy::GetWorldPosition();
-	//敵キャラから自キャラへと差別ベクトルを求める
-	Vector3 direction = enemyPos - playerPos;
-	//ベクトル正規化
-	Vector3 normalizedDirection = Normalize(direction);
-	//ベクトルの長さを、速さに合わせる
-	velocity = normalizedDirection * kBulletSpeed;
+	for (int i = 0; i < kBulletsPerFire; ++i) {
+		// ランダムな初期位置を計算
+		float randomX = (static_cast<float>(rand()) / RAND_MAX) * 2.0f * kRandomRangeX - kRandomRangeX;
+		float randomY = (static_cast<float>(rand()) / RAND_MAX) * 2.0f * kRandomRangeY - kRandomRangeY;
+		Vector3 bulletPosition(worldTransform_.translation_.x + randomX, worldTransform_.translation_.y + randomY, worldTransform_.translation_.z);
 
-	// 弾を生成し、初期化
-	EnemyBullet* newBullet = new EnemyBullet();
-	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
-	// 弾を登録する
-	bullets_.push_back(newBullet);
+		// ランダムに速い弾かどうかを決定
+		float randomValue = static_cast<float>(rand()) / RAND_MAX; // 0.0f ～ 1.0f のランダム値
+		float bulletSpeed = (randomValue < kFastBulletProbability) ? kFastBulletSpeed : kNormalBulletSpeed;
+
+		// 発射方向は固定（Z軸方向にまっすぐ）
+		Vector3 velocity(-bulletSpeed, 0.0f, 0.0f);
+
+		// 弾を生成し、初期化
+		EnemyBullet* newBullet = new EnemyBullet();
+		newBullet->Initialize(model_, bulletPosition, velocity);
+
+		// 弾を登録する
+		bullets_.push_back(newBullet);
+	}
+
+	// 発射カウンタを更新
+	fireCount_++;
 }
+
 
 Enemy::~Enemy() {
 	for (EnemyBullet* bullet : bullets_) {
@@ -169,4 +204,13 @@ Vector3 Enemy::GetWorldPosition() {
 	return worldPos;
 }
 
-void Enemy::OnCollision() { isDead_ = true; }
+void Enemy::OnCollision() {
+	hp_--;
+
+	if (hp_ <= 0) {
+		hp_ = 0;
+		isDead_ = true;
+		finished_ = true;
+	}
+}
+

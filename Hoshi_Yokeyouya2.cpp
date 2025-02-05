@@ -8,10 +8,11 @@
 Hoshi_Yokeyouya2::Hoshi_Yokeyouya2() {}
 
 Hoshi_Yokeyouya2::~Hoshi_Yokeyouya2() {
-	delete model_;
+	delete modelPlayer_;
 	delete player_;
 	delete debugCamera_;
 	delete enemy_;
+	audio_->StopWave(voiceHandle);
 }
 
 void Hoshi_Yokeyouya2::Initialize() {
@@ -21,10 +22,12 @@ void Hoshi_Yokeyouya2::Initialize() {
 	// ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("mario.jpg ");
 	textureHandleEnemy_ = TextureManager::Load("Blue.png ");
+	modelHaikei_ = Model::CreateFromOBJ("Haikei", true);
 
 	// 3Dモデルの生成
-	model_ = Model::Create();
-	modelEnemy_ = Model::Create();
+	
+	modelPlayer_ = Model::CreateFromOBJ("ziki",true);
+	modelEnemy_ = Model::CreateFromOBJ("hosi",true);
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
@@ -34,12 +37,22 @@ void Hoshi_Yokeyouya2::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 	// 自キャラの初期化
-	player_->Initialize(model_, textureHandle_);
+	player_->Initialize(modelPlayer_, &viewProjection_);
 
 	// 敵キャラの生成
 	enemy_ = new Enemy();
 	// 敵キャラの初期化
-	enemy_->Initialize(modelEnemy_, textureHandleEnemy_);
+	enemy_->Initialize(modelEnemy_,&viewProjection_);
+
+	// 天球の生成
+	haikei_ = new Haikei();
+	// 天球の初期化
+	haikei_->Initialize(modelHaikei_, &viewProjection_);
+
+	//サウンド
+	soundDataHandle=audio_->LoadWave("GameBGM.mp3");
+	//音声再生
+	voiceHandle=audio_->PlayWave(soundDataHandle,true);
 
 	// 軸方向表示の表示を有効にする
 	AxisIndicator::GetInstance()->SetVisible(true);
@@ -48,21 +61,28 @@ void Hoshi_Yokeyouya2::Initialize() {
 }
 
 void Hoshi_Yokeyouya2::Update() {
+
+	// 天球の更新
+	haikei_->Update();
+	// プレイヤーの更新
 	player_->Update();
 
 	// 敵キャラの更新
 	enemy_->Update();
 
+	//audio_->StopWave(voiceHandle);
+
+	if (enemy_->IsFinished() == true || player_->IsFinished() == true) {
+		finished_ = true;
+	}
+
+	HealthFlag_ = player_->IsHealth();
+
 	// 敵キャラに自キャラのアドレスを渡す
 	enemy_->SetPlayer(player_);
 
 	CheckAllCollision();
-	// キャラクターの座標を画面表示する処理
-	ImGui::Begin("Scene");
-
-	ImGui::Text("kHoshi_Yokeyouya2"); // フェーズ名を表示
-
-	ImGui::End();
+	
 }
 
 void Hoshi_Yokeyouya2::Draw() {
@@ -89,6 +109,8 @@ void Hoshi_Yokeyouya2::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	// 天球の描画
+	haikei_->Draw();
 
 	// 自キャラの描画
 	player_->Draw(viewProjection_);

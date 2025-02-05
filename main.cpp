@@ -21,12 +21,15 @@ GameClearScene* gameClearScene = nullptr;
 GameOverScene* gameOverScene = nullptr;
 Hoshi_Yokeyouya* hoshi_Yokeyouya = nullptr;
 Hoshi_Yokeyouya2* hoshi_Yokeyouya2 = nullptr;
+Model* model_ = nullptr;
+ViewProjection* viewProjection_ = nullptr;
 
 enum class Scene {
 	kTitle,
 	kStageSelect,
-	kGameClear,
+	kGameScene,
 	kGameOver,
+	kGameClear,
 };
 
 Scene scene = Scene::kTitle;
@@ -52,7 +55,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 汎用機能
 	Input* input = nullptr;
 	Audio* audio = nullptr;
-	AxisIndicator* axisIndicator = nullptr;
 	PrimitiveDrawer* primitiveDrawer = nullptr;
 
 	// ゲームウィンドウの作成
@@ -86,32 +88,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 3Dモデル静的初期化
 	Model::StaticInitialize();
 
-	// 軸方向表示初期化
-	axisIndicator = AxisIndicator::GetInstance();
-	axisIndicator->Initialize();
-
 	primitiveDrawer = PrimitiveDrawer::GetInstance();
 	primitiveDrawer->Initialize();
 #pragma endregion
-
-	// ゲームシーンの初期化
-	hoshi_Yokeyouya = new Hoshi_Yokeyouya();
-	hoshi_Yokeyouya->Initialize();
-
-	hoshi_Yokeyouya2 = new Hoshi_Yokeyouya2();
-	hoshi_Yokeyouya2->Initialize();
-
-	hoshi_Yokeyouya3D = new Hoshi_Yokeyouya3D();
-	hoshi_Yokeyouya3D->Initialize();
 
 	scene = Scene::kTitle;
 	// タイトルシーンの初期化
 	titleScene = new TitleScene;
 	titleScene->Initialize();
 
-	selectScene = new SelectScene();
-	selectScene->Initialize();
-
+	
 	// メインループ
 	while (true) {
 		// メッセージ処理
@@ -128,8 +114,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		UpdateScene();
 		// ゲームシーンの毎フレーム処理
 		//gameScene->Update();
-		// 軸表示の更新
-		axisIndicator->Update();
 		// ImGui受付終了
 		imguiManager->End();
 
@@ -139,8 +123,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawScene();
 		// ゲームシーンの描画
 		//gameScene->Draw();
-		// 軸表示の描画
-		axisIndicator->Draw();
 		// プリミティブ描画のリセット
 		primitiveDrawer->Reset();
 		// ImGui描画
@@ -185,21 +167,21 @@ void ChangeScene() {
 		if (selectScene) {
 			if (selectScene->IsOne()) {
 				gameScene = GameScene::kHoshi_Yokeyouya;
-				scene = Scene::kGameClear; // Gameplayに移行
+				scene = Scene::kGameScene; // Gameplayに移行
 				delete selectScene;
 				selectScene = nullptr;
 				hoshi_Yokeyouya = new Hoshi_Yokeyouya;
 				hoshi_Yokeyouya->Initialize();
 			} else if (selectScene->IsTwo()) {
 				gameScene = GameScene::kHoshi_Yokeyouya2;
-				scene = Scene::kGameClear;
+				scene = Scene::kGameScene;
 				delete selectScene;
 				selectScene = nullptr;
 				hoshi_Yokeyouya2 = new Hoshi_Yokeyouya2;
 				hoshi_Yokeyouya2->Initialize();
 			} else if (selectScene->IsThree()) {
 				gameScene = GameScene::kHoshi_Yokeyouya3D;
-				scene = Scene::kGameClear;
+				scene = Scene::kGameScene;
 				delete selectScene;
 				selectScene = nullptr;
 				hoshi_Yokeyouya3D = new Hoshi_Yokeyouya3D;
@@ -208,35 +190,63 @@ void ChangeScene() {
 		}
 		break;
 
-	case Scene::kGameClear:
+	case Scene::kGameScene:
 		switch (gameScene) {
 		case GameScene::kHoshi_Yokeyouya:
 			if (hoshi_Yokeyouya->IsFinished()) {
+				if (hoshi_Yokeyouya->IsHealth()){
+					scene = Scene::kGameOver;
+					// 新シーンの生成と初期化
+					gameOverScene = new GameOverScene;
+					gameOverScene->Initialize();
+				}
+				else
+				{
+					scene = Scene::kGameClear;
+					gameClearScene = new GameClearScene;
+					gameClearScene->Initialize();
+				}
 				delete hoshi_Yokeyouya;
 				hoshi_Yokeyouya = nullptr;
-				scene = Scene::kTitle;
-				titleScene = new TitleScene;
-				titleScene->Initialize();
 			}
 			break;
 
 		case GameScene::kHoshi_Yokeyouya2:
 			if (hoshi_Yokeyouya2->IsFinished()) {
+				if (hoshi_Yokeyouya2->IsHealth()) {
+					scene = Scene::kGameOver;
+					// 新シーンの生成と初期化
+					gameOverScene = new GameOverScene;
+					gameOverScene->Initialize();
+				}
+				else
+				{
+					scene = Scene::kGameClear;
+					gameClearScene = new GameClearScene;
+					gameClearScene->Initialize();
+				}
 				delete hoshi_Yokeyouya2;
 				hoshi_Yokeyouya2 = nullptr;
-				scene = Scene::kTitle;
-				titleScene = new TitleScene;
-				titleScene->Initialize();
 			}
 			break;
 
 		case GameScene::kHoshi_Yokeyouya3D:
+
 			if (hoshi_Yokeyouya3D->IsFinished()) {
+				if (hoshi_Yokeyouya3D->IsHealth()) {
+					scene = Scene::kGameOver;
+					// 新シーンの生成と初期化
+					gameOverScene = new GameOverScene;
+					gameOverScene->Initialize();
+				}
+				else 
+				{
+					scene = Scene::kGameClear;
+					gameClearScene = new GameClearScene;
+					gameClearScene->Initialize();
+				}
 				delete hoshi_Yokeyouya3D;
 				hoshi_Yokeyouya3D = nullptr;
-				scene = Scene::kTitle;
-				titleScene = new TitleScene;
-				titleScene->Initialize();
 			}
 			break;
 		}
@@ -251,6 +261,16 @@ void ChangeScene() {
 			titleScene->Initialize();
 		}
 		break;
+
+	case Scene::kGameClear:
+		if (gameClearScene->IsFinished()) {
+			scene = Scene::kTitle;
+			delete gameClearScene;
+			gameClearScene = nullptr;
+			titleScene = new TitleScene;
+			titleScene->Initialize();
+		}
+		break;
 	}
 }
 void UpdateScene() {
@@ -261,11 +281,14 @@ void UpdateScene() {
 	case Scene::kStageSelect:
 		selectScene->Update();
 		break;
-	case Scene::kGameClear:
+	case Scene::kGameScene:
 		UpdateGameScene();
 		break;
 	case Scene::kGameOver:
 		gameOverScene->Update();
+		break;
+	case Scene::kGameClear:
+		gameClearScene->Update();
 		break;
 	}
 }
@@ -278,11 +301,14 @@ void DrawScene() {
 	case Scene::kStageSelect:
 		selectScene->Draw();
 		break;
-	case Scene::kGameClear:
+	case Scene::kGameScene:
 		DrawGameScene();
 		break;
 	case Scene::kGameOver:
 		gameOverScene->Draw();
+		break;
+	case Scene::kGameClear:
+		gameClearScene->Draw();
 		break;
 	}
 }
